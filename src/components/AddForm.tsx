@@ -1,19 +1,9 @@
 import React, { useState } from "react";
-import firebase from "firebase";
-
-type Datum = {
-    name: string;
-    price: string;
-    id?: string;
-};
-
-type AddDatum = {
-    name: string;
-    price: number;
-};
+import { Datum } from "./Container";
 
 type Props = {
     db: firebase.firestore.Firestore;
+    setUpdate: (b: boolean) => void;
 };
 
 const AddForm: React.FunctionComponent<Props> = (props: Props) => {
@@ -32,7 +22,7 @@ const AddForm: React.FunctionComponent<Props> = (props: Props) => {
             setPrice(e.target.value);
             setMessage("");
         } else {
-            setMessage("You must enter a integer");
+            setMessage("You must enter an integer");
         }
     };
 
@@ -41,11 +31,14 @@ const AddForm: React.FunctionComponent<Props> = (props: Props) => {
     ) => {
         e.preventDefault();
         if (name && price) {
-            const datumToBeAdded: AddDatum = {
+            const datumToBeAdded: Datum = {
                 name,
                 price: parseInt(price)
             };
             props.db.collection("expenses").add(datumToBeAdded);
+            props.setUpdate(false);
+            setName("");
+            setPrice("");
         } else {
             setMessage("You must set both a name and a price");
         }
