@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { FullDatum } from "./Container";
-import { pie, arc } from "d3-shape";
+import { pie, arc, DefaultArcObject } from "d3-shape";
 import { scaleOrdinal } from "d3-scale";
 import { select, Selection } from "d3-selection";
+import { interpolate } from "d3-interpolate";
+import "d3-transition";
 
 type Props = {
     list: FullDatum[];
@@ -35,11 +37,15 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
         if (!mount && !selection) {
             setSelection(select(arcRef.current));
             setMount(true);
+        } else {
+            updateChart();
         }
-        renderChart();
+        mountChart();
     });
 
-    const renderChart = () => {
+    const updateChart = () => {};
+
+    const mountChart = () => {
         if (selection) {
             const paths = selection
                 .append("g")
@@ -56,8 +62,28 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
                 .attr("stroke", "red")
                 .attr("stroke-width", 3)
                 .attr("fill", "blue")
-                .attr("d", arcGenerator as any);
+                .transition()
+                .duration(750)
+                .attrTween("d", arcTweenEnter as any);
         }
+    };
+
+    const arcTweenEnter = (d: DefaultArcObject) => {
+        let i = interpolate(d.endAngle, d.startAngle);
+
+        return (t: number) => {
+            d.startAngle = i(t);
+            return arcGenerator(d);
+        };
+    };
+
+    const arcTweenExit = (d: DefaultArcObject) => {
+        let i = interpolate(d.startAngle, d.endAngle);
+
+        return (t: number) => {
+            d.startAngle = i(t);
+            return arcGenerator(d);
+        };
     };
 
     return (
