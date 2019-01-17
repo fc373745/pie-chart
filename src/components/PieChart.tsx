@@ -24,7 +24,6 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
         x: dimensions.width / 2 + 5,
         y: dimensions.height / 2 + 5
     };
-
     const [mount, setMount] = useState(false);
     const [selection, setSelection] = useState<Selection<
         SVGSVGElement | null,
@@ -37,21 +36,23 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
         if (!mount && !selection) {
             setSelection(select(arcRef.current));
             setMount(true);
-        } else {
-            updateChart();
         }
         mountChart();
     });
 
-    const updateChart = () => {};
-
     const mountChart = () => {
         if (selection) {
             const paths = selection
-                .append("g")
                 .attr("transform", `translate(${cent.x}, ${cent.y})`)
                 .selectAll("path")
                 .data(pieGenerator(props.list));
+
+            paths
+                .exit()
+                .transition()
+                .duration(750)
+                .attrTween("d", arcTweenExit as any)
+                .remove();
 
             paths.attr("d", arcGenerator as any);
 
@@ -89,10 +90,11 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
     return (
         <div>
             <svg
-                ref={arcRef}
                 width={dimensions.width + 150}
                 height={dimensions.height + 150}
-            />
+            >
+                <g ref={arcRef} />
+            </svg>
         </div>
     );
 };
