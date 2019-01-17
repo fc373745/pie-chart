@@ -40,9 +40,9 @@ export const Container: React.FunctionComponent = () => {
     });
     return (
         <div>
+            <PieChart list={list} />
             <AddForm db={db} setUpdate={setUpdate} />
             <List db={db} list={list} setUpdate={setUpdate} />
-            <PieChart list={list} />
         </div>
     );
 };

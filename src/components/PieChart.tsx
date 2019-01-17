@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, SVGPathElementTwo } from "react";
 import { FullDatum } from "./Container";
-import { pie, arc, DefaultArcObject } from "d3-shape";
+import { pie, arc, DefaultArcObject, PieArcDatum } from "d3-shape";
 import { scaleOrdinal } from "d3-scale";
 import { select, Selection } from "d3-selection";
 import { interpolate } from "d3-interpolate";
@@ -9,6 +9,12 @@ import "d3-transition";
 type Props = {
     list: FullDatum[];
 };
+
+declare module "react" {
+    interface SVGPathElementTwo extends SVGPathElement {
+        _current: PieArcDatum<FullDatum>;
+    }
+}
 
 export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
     const arcRef = React.createRef<SVGSVGElement>();
@@ -54,15 +60,22 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
                 .attrTween("d", arcTweenExit as any)
                 .remove();
 
-            paths.attr("d", arcGenerator as any);
+            paths
+                .attr("d", arcGenerator as any)
+                .transition()
+                .duration(750)
+                .attrTween("d", arcTweenUpdate as any);
 
             paths
                 .enter()
-                .append("path")
+                .append<SVGPathElementTwo>("path")
                 .attr("class", "arc")
                 .attr("stroke", "red")
                 .attr("stroke-width", 3)
                 .attr("fill", "blue")
+                .each(function(d) {
+                    this._current = d;
+                })
                 .transition()
                 .duration(750)
                 .attrTween("d", arcTweenEnter as any);
@@ -86,6 +99,14 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
             return arcGenerator(d);
         };
     };
+
+    function arcTweenUpdate(this: SVGPathElementTwo, d: any) {
+        let i = interpolate(this._current, d);
+        this._current = i(1);
+        return function(t: number) {
+            return arcGenerator(i(t));
+        };
+    }
 
     return (
         <div>
