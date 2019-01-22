@@ -7,7 +7,17 @@ import { interpolate } from "d3-interpolate";
 import { schemeSet3 } from "d3-scale-chromatic";
 import { legendColor } from "d3-svg-legend";
 import "d3-transition";
+import styled, { createGlobalStyle } from "styled-components";
 
+const GlobalStyle = createGlobalStyle`
+    .inner{
+        
+        &:hover {
+            transform: scale(1.1);
+            transition-duration: 250ms;
+        }
+    }
+`;
 type Props = {
     list: FullDatum[];
 };
@@ -73,7 +83,7 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
             paths
                 .enter()
                 .append<SVGPathElementTwo>("path")
-                .attr("class", "arc")
+                .attr("class", "inner")
                 .attr("stroke", "red")
                 .attr("stroke-width", 3)
                 .attr("fill", d => color(d.data.name))
@@ -129,7 +139,9 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
                 width={dimensions.width + 150}
                 height={dimensions.height + 150}
             >
+                <GlobalStyle />
                 <g ref={arcRef} />
+
                 <g ref={legendRef} />
             </svg>
         </div>
