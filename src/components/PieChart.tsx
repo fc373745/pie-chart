@@ -5,6 +5,7 @@ import { scaleOrdinal } from "d3-scale";
 import { select, Selection } from "d3-selection";
 import { interpolate } from "d3-interpolate";
 import { schemeSet3 } from "d3-scale-chromatic";
+import { legendColor } from "d3-svg-legend";
 import "d3-transition";
 
 type Props = {
@@ -19,6 +20,7 @@ declare module "react" {
 
 export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
     const arcRef = React.createRef<SVGSVGElement>();
+    const legendRef = React.createRef<SVGSVGElement>();
 
     const dimensions = { height: 300, width: 300, radius: 150 };
     const pieGenerator = pie<FullDatum>()
@@ -81,6 +83,17 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
                 .transition()
                 .duration(750)
                 .attrTween("d", arcTweenEnter as any);
+
+            const legendGroup = select(legendRef.current).attr(
+                "transform",
+                `translate(${dimensions.width + 40}, 10)`
+            );
+
+            const legend = legendColor()
+                .shape("circle")
+                .scale(color);
+
+            legendGroup.call(legend as any);
         }
     };
 
@@ -117,6 +130,7 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
                 height={dimensions.height + 150}
             >
                 <g ref={arcRef} />
+                <g ref={legendRef} />
             </svg>
         </div>
     );
