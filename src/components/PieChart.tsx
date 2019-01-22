@@ -45,6 +45,7 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
     };
     const color = scaleOrdinal(schemeSet3);
     const [mount, setMount] = useState(false);
+    const [hover, setHover] = useState("");
     const [selection, setSelection] = useState<Selection<
         SVGSVGElement | null,
         {},
@@ -84,6 +85,10 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
                 .enter()
                 .append<SVGPathElementTwo>("path")
                 .attr("class", "inner")
+                .on("mouseover", d =>
+                    handleMouseOver(d.data.name, d.data.price)
+                )
+                .on("mouseout", () => setHover(""))
                 .attr("stroke", "red")
                 .attr("stroke-width", 3)
                 .attr("fill", d => color(d.data.name))
@@ -105,6 +110,10 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
 
             legendGroup.call(legend as any);
         }
+    };
+
+    const handleMouseOver = (name: string, price: number) => {
+        setHover(`${name} | ${price}`);
     };
 
     const arcTweenEnter = (d: DefaultArcObject) => {
@@ -144,6 +153,7 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
 
                 <g ref={legendRef} />
             </svg>
+            <div>{hover}</div>
         </div>
     );
 };
