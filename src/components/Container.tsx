@@ -38,11 +38,19 @@ export const Container: React.FunctionComponent = () => {
                 });
         }
     });
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        console.log("w");
+    };
     return (
         <div>
             <PieChart list={list} />
             <AddForm db={db} setUpdate={setUpdate} />
             <List db={db} list={list} setUpdate={setUpdate} />
+            <form onSubmit={handleSubmit}>
+                <button type="submit">click</button>
+            </form>
         </div>
     );
 };

@@ -4,6 +4,7 @@ import { pie, arc, DefaultArcObject, PieArcDatum } from "d3-shape";
 import { scaleOrdinal } from "d3-scale";
 import { select, Selection } from "d3-selection";
 import { interpolate } from "d3-interpolate";
+import { schemeSet3 } from "d3-scale-chromatic";
 import "d3-transition";
 
 type Props = {
@@ -30,6 +31,7 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
         x: dimensions.width / 2 + 5,
         y: dimensions.height / 2 + 5
     };
+    const color = scaleOrdinal(schemeSet3);
     const [mount, setMount] = useState(false);
     const [selection, setSelection] = useState<Selection<
         SVGSVGElement | null,
@@ -72,7 +74,7 @@ export const PieChart: React.FunctionComponent<Props> = (props: Props) => {
                 .attr("class", "arc")
                 .attr("stroke", "red")
                 .attr("stroke-width", 3)
-                .attr("fill", "blue")
+                .attr("fill", d => color(d.data.name))
                 .each(function(d) {
                     this._current = d;
                 })
